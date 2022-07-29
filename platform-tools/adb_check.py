@@ -14,7 +14,7 @@ cols=[160,320,480,700,900]
 #third row 1300
 #fourth 1500
 def installPing():
-    installPath=r"C:\Users\ahq09\Desktop\PingTools_Network_Utilities_v4.52_Free_apkpure.com.apk"
+    installPath=r"C:\Users\17345\Desktop\PingTools_Network_Utilities_v4.52_Free_apkpure.com.apk"
     commandInsideTerminal("adb install %s"%installPath)
 def adb(command):
     proc=subprocess.Popen(command.split(' '), stdout=subprocess.PIPE,shell=True)
@@ -109,6 +109,7 @@ def renameAndCompress(type):
     commandInsideTerminal(command)
 
 def phone(number):
+    sim1DataSet()
     adb("adb shell settings put global multi_sim_voice_call 3")
     adb("adb shell am start -a android.intent.action.CALL -d tel:%d"%number)
     time.sleep(2)
@@ -118,11 +119,14 @@ def phone(number):
 
     time.sleep(5)
 
+    sim2DataSet()
     adb("adb shell am start -a android.intent.action.CALL -d tel:%d"%number)
     time.sleep(2)
     tapSim2()
     time.sleep(10)
     adb("adb shell input keyevent 6")
+
+
 def mms(number):
     unlock()
     time.sleep(2)
@@ -141,25 +145,67 @@ def mms(number):
 
 
 def taskPhone(number):
+    airModeOn()
+    airModeOff()
     start()
     logPlay()
     phone(number)
     logStop()
-    renameAndCompress("5gmomt")
+    renameAndCompress("4gmomt")
 
 def taskMMS(number):
+    airModeOn()
+    airModeOff()
     start()
     logPlay()
     mms(number)
     logStop()
     renameAndCompress("MMS")
 
+def wifiOn():
+    adb("adb root")
+    time.sleep(3)
+    adb("adb shell wpa_cli -iwlan0 add_network  0")
+    adb("adb shell wpa_cli -iwlan0 set_network   0  ssid 'sawtest_5G'")
+    adb("adb shell wpa_cli -iwlan0 set_network   0  psk 'sawtest123'")
+    adb("adb shell wpa_cli -iwlan0 save_config")
+    adb("adb shell wpa_cli -iwlan0 select_network  0")            #选择第0个热点
+    adb("adb shell wpa_cli -iwlan0 enable_network 0")
+
+
+def taskWificall(number):#还没解决如何连上wifi
+    start()
+    logPlay()
+
+
+    adb("adb shell settings put global multi_sim_voice_call 3")
+    adb("adb shell am start -a android.intent.action.CALL -d tel:%d"%number)
+    time.sleep(2)
+    time.sleep(8)
+    adb("adb shell input keyevent 6") #6 is endcall
+    time.sleep(5)
+    adb("adb shell am start -a android.intent.action.CALL -d tel:%d"%number)
+    time.sleep(2)
+    adb("adb shell input keyevent 6")
+    time.sleep(2)
+    logStop()
+    renameAndCompress("Wificall")
+
 def allow():
     adb("adb shell input keyevent 66")
     adb("adb shell input keyevent 61")
     adb("adb shell input keyevent 62")
 
-# taskMMS(9452327569)
+def airModeOn():
+    adb("adb root")
+    time.sleep(3)
+    adb('adb shell settings put global airplane_mode_on 1')
+    adb('adb shell am broadcast -a android.intent.action.AIRPLANE_MODE')
+def airModeOff():
+    adb("adb root")
+    time.sleep(3)
+    adb('adb shell settings put global airplane_mode_on 0')
+    adb('adb shell am broadcast -a android.intent.action.AIRPLANE_MODE')
 
 def browser():
     sim1DataSet()
@@ -168,6 +214,8 @@ def browser():
     sim2DataSet()
     time.sleep(10)
     adb("adb shell am start -a android.intent.action.VIEW -d https://yahoo.com/?.tsrc=mtkandroid")
+
+
 def sim1DataSet():
     unlock()
     tapSettings()
@@ -175,6 +223,7 @@ def sim1DataSet():
     tap(480,1900)#sim card
     tap(480,1500)#mobile data
     tap(480,1250)
+    time.sleep(10)
 def sim2DataSet():
     unlock()
     tapSettings()
@@ -182,14 +231,20 @@ def sim2DataSet():
     tap(480,1900)#sim card
     tap(480,1500)#mobile data
     tap(480,1400)
+    time.sleep(10)
 
 def pingSet():
     tapPing()
     tap(80,200)
     tap(80,800)
 
-pingSet()
+# pingSet()
 # browser()
+# tapbrowser()
+installPing()
+# taskPhone(9728355264)
+# taskWificall(9728355264)
+
 
 # mms(9452327569)
 # tapSim2()
